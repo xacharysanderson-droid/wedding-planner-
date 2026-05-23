@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aisle — Wedding Planning</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%239B5C4E'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-family='Georgia' font-style='italic' font-size='52' fill='%23FBF7EE'%3EA%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --ivory: #F8F4EE; --ivory-2: #F2EBDF; --paper: #FFFFFF;
+    --ink: #1F2A44; --ink-muted: #4A5063; --muted: #6B6E7A;
+    --rule: #E5DBC8; --rule-2: #DCD3C4;
+    --terracotta: #9B5C4E; --terracotta-soft: #E6CFC8;
+    --sage: #6C8C6E; --sage-soft: #D6E0D2;
+    --gold: #B18C4E; --gold-soft: #ECDDB8;
+    --amber: #C8862E; --rose: #C97C7C;
+    --shadow-card: 0 1px 2px rgba(31,42,68,.05), 0 4px 14px rgba(31,42,68,.04);
+    --shadow-pop: 0 12px 32px rgba(31,42,68,.14);
+  }
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; background: var(--ivory); color: var(--ink); font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; -webkit-font-smoothing: antialiased; min-height: 100%; }
+  h1, h2, h3, h4, .serif { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+  input, select, textarea { font: inherit; color: inherit; }
+
+  .app { min-height: 100vh; display: grid; grid-template-columns: 240px 1fr; }
+
+  /* Sidebar */
+  .sidebar { background: #FBF8F2; border-right: 1px solid var(--rule); padding: 28px 18px; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+  .brand { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .brand .logo { font-family: Georgia, serif; font-style: italic; font-size: 30px; color: var(--ink); }
+  .brand .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--terracotta); transform: translateY(-6px); }
+  .brand-sub { font-size: 11px; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 28px; }
+
+  .nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav .group { font-size: 10px; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; padding: 16px 12px 6px; }
+  .nav button { background: none; border: none; text-align: left; padding: 10px 12px; border-radius: 10px; color: var(--ink-muted); font-size: 14px; display: flex; align-items: center; gap: 12px; transition: all .15s ease; }
+  .nav button:hover { background: var(--ivory-2); color: var(--ink); }
+  .nav button.active { background: var(--ink); color: #FBF7EE; }
+  .nav button .ico { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; }
+  .nav .badge { margin-left: auto; font-size: 11px; background: var(--terracotta-soft); color: var(--terracotta); border-radius: 999px; padding: 1px 8px; }
+  .nav button.active .badge { background: rgba(255,255,255,.18); color: #FBF7EE; }
+
+  .couple { padding: 14px; background: var(--ivory-2); border-radius: 12px; margin-top: 20px; display: flex; gap: 10px; align-items: center; }
+  .avatar-stack { display: flex; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--terracotta); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; border: 2px solid #FBF8F2; margin-left: -8px; font-weight: 600; }
+  .avatar:first-child { margin-left: 0; background: var(--sage); }
+  .couple-meta { font-size: 12px; line-height: 1.3; flex: 1; min-width: 0; }
+  .couple-meta strong { color: var(--ink); display: block; font-weight: 600; }
+  .couple-meta span { color: var(--muted); }
+
+  /* Main */
+  .main { padding: 36px 44px 80px; max-width: 1240px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
+  .crumb { font-size: 12px; color: var(--muted); letter-spacing: .05em; }
+  .topbar-actions { display: flex; gap: 8px; }
+  .btn { border: 1px solid var(--rule-2); background: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; color: var(--ink); transition: all .15s ease; }
+  .btn:hover { border-color: var(--ink); }
+  .btn-primary { background: var(--ink); color: #FBF7EE; border-color: var(--ink); }
+  .btn-primary:hover { background: #16203A; }
+  .btn-danger { color: var(--terracotta); border-color: var(--terracotta-soft); background: #fff; }
+  .btn-danger:hover { background: var(--terracotta-soft); }
+  .btn-ghost { border: none; background: none; color: var(--muted); padding: 4px 8px; }
+  .btn-ghost:hover { color: var(--ink); background: var(--ivory-2); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  .page-title { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
+  .page-title h1 { font-size: 36px; margin: 0; font-style: italic; }
+  .page-title .sub { color: var(--muted); font-size: 14px; }
+
+  .grid { display: grid; gap: 18px; }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .cols-2 { grid-template-columns: 2fr 1fr; }
+  .cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card { background: #fff; border: 1px solid var(--rule); border-radius: 14px; padding: 22px; box-shadow: var(--shadow-card); }
+  .card h3 { margin: 0 0 4px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 600; }
+  .card .big { font-size: 32px; font-family: Georgia, serif; color: var(--ink); margin: 8px 0 4px; }
+  .card .delta { font-size: 12px; color: var(--muted); }
+  .card .delta.up { color: var(--sage); }
+  .card .delta.warn { color: var(--terracotta); }
+
+  .countdown { background: linear-gradient(135deg, #1F2A44 0%, #2C3A5E 100%); color: #FBF7EE; border-radius: 18px; padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .countdown::after { content: ''; position: absolute; right: -30px; top: -30px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(177,140,78,.18) 0%, transparent 70%); }
+  .countdown .greet { font-size: 13px; opacity: .75; letter-spacing: .06em; }
+  .countdown .who { font-family: Georgia, serif; font-style: italic; font-size: 28px; margin: 4px 0; }
+  .countdown .when { font-size: 14px; opacity: .85; }
+  .countdown .days { text-align: right; position: relative; z-index: 1; }
+  .countdown .days .n { font-family: Georgia, serif; font-size: 64px; line-height: 1; font-weight: 300; }
+  .countdown .days .l { font-size: 12px; letter-spacing: .18em; opacity: .7; text-transform: uppercase; }
+
+  .section-h { display: flex; align-items: baseline; justify-content: space-between; margin: 30px 0 12px; }
+  .section-h h2 { font-size: 22px; margin: 0; font-style: italic; }
+  .section-h a { color: var(--terracotta); font-size: 13px; cursor: pointer; }
+
+  /* Pills */
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; letter-spacing: .02em; white-space: nowrap; }
+  .pill.sage { background: var(--sage-soft); color: #3F5840; }
+  .pill.terra { background: var(--terracotta-soft); color: #6B3A30; }
+  .pill.gold { background: var(--gold-soft); color: #75571F; }
+  .pill.grey { background: var(--ivory-2); color: var(--muted); }
+  .pill.rose { background: #F5D9D9; color: #8A4646; }
+  .pill.ink { background: var(--ink); color: #FBF7EE; }
+
+  /* Progress */
+  .progress { background: var(--ivory-2); border-radius: 999px; height: 8px; overflow: hidden; margin: 8px 0 4px; }
+  .progress > div { height: 100%; background: var(--ink); border-radius: 999px; transition: width .25s ease; }
+  .progress > div.terra { background: var(--terracotta); }
+  .progress > div.sage { background: var(--sage); }
+  .progress > div.gold { background: var(--gold); }
+  .progress > div.warn { background: var(--amber); }
+
+  /* Tables */
+  table.aisle { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.aisle th { text-align: left; font-weight: 600; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 12px 14px; border-bottom: 1px solid var(--rule); background: #FBF8F2; }
+  table.aisle td { padding: 14px; border-bottom: 1px solid var(--rule); color: var(--ink); vertical-align: middle; }
+  table.aisle tr:hover td { background: #FCFAF5; }
+  .guest-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--ivory-2); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; margin-right: 10px; flex-shrink: 0; }
+  .guest-name { display: flex; align-items: center; }
+  .tags { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .tag { font-size: 10px; padding: 1px 7px; border-radius: 4px; background: var(--ivory-2); color: var(--muted); }
+  .tag.allergy { background: #FBE3DC; color: #8A3F30; }
+
+  /* List */
+  .list { display: flex; flex-direction: column; }
+  .list-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .icon-tile { width: 36px; height: 36px; border-radius: 10px; background: var(--ivory-2); display: flex; align-items: center; justify-content: center; color: var(--terracotta); font-size: 16px; flex-shrink: 0; }
+  .list-row .body { flex: 1; min-width: 0; }
+  .list-row .title { font-size: 14px; color: var(--ink); }
+  .list-row .meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .list-row .right { font-size: 13px; color: var(--ink); text-align: right; }
+
+  /* Forms */
+  .form-grid { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+  .field input, .field select, .field textarea { border: 1px solid var(--rule-2); border-radius: 10px; padding: 10px 12px; font-size: 14px; background: #fff; color: var(--ink); outline: none; transition: border-color .15s ease; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
+  .field textarea { min-height: 70px; resize: vertical; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .checkbox-row input { width: 16px; height: 16px; }
+
+  /* Modal */
+  .scrim { position: fixed; inset: 0; background: rgba(31,42,68,.35); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(2px); }
+  .modal { background: #fff; border-radius: 18px; box-shadow: var(--shadow-pop); width: 100%; max-width: 560px; max-height: 90vh; overflow: auto; }
+  .modal.lg { max-width: 720px; }
+  .modal-head { padding: 22px 26px 0; display: flex; align-items: baseline; justify-content: space-between; }
+  .modal-head h2 { margin: 0; font-style: italic; font-size: 24px; }
+  .modal-head .close { background: none; border: none; font-size: 22px; color: var(--muted); cursor: pointer; }
+  .modal-body { padding: 18px 26px 22px; }
+  .modal-foot { padding: 16px 26px 22px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--rule); }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty .e-title { font-family: Georgia, serif; font-style: italic; font-size: 22px; color: var(--ink); margin-bottom: 6px; }
+  .empty .e-sub { font-size: 14px; margin-bottom: 18px; }
+
+  /* Donut */
+  .donut-wrap { display: flex; gap: 28px; align-items: center; }
+  .donut { width: 180px; height: 180px; position: relative; flex-shrink: 0; }
+  .donut svg { transform: rotate(-90deg); width: 180px; height: 180px; }
+  .donut .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut .center .big { font-family: Georgia, serif; font-size: 28px; }
+  .donut .center .lbl { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+  .legend { flex: 1; display: grid; gap: 8px; min-width: 0; }
+  .legend .row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .legend .row .swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend .row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend .row .val { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* Mood */
+  .mood-grid { columns: 4; column-gap: 14px; }
+  .mood-grid > div { break-inside: avoid; margin-bottom: 14px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-card); background: #fff; position: relative; cursor: pointer; transition: transform .15s ease; }
+  .mood-grid > div:hover { transform: translateY(-2px); }
+  .mood-grid img, .mood-grid svg { display: block; width: 100%; height: auto; }
+  .mood-cap { padding: 8px 12px; font-size: 12px; color: var(--ink); display: flex; justify-content: space-between; align-items: center; }
+  .mood-cap .heart { color: var(--terracotta); }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 70px; }
+  .timeline::before { content: ''; position: absolute; left: 56px; top: 6px; bottom: 6px; width: 2px; background: var(--rule); }
+  .t-item { position: relative; padding: 14px 16px; background: #fff; border: 1px solid var(--rule); border-radius: 12px; margin-bottom: 12px; }
+  .t-item .time { position: absolute; left: -70px; top: 16px; font-family: Georgia, serif; font-style: italic; color: var(--ink); font-size: 14px; width: 50px; text-align: right; }
+  .t-item::before { content: ''; position: absolute; left: -16px; top: 22px; width: 10px; height: 10px; background: var(--terracotta); border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--rule); }
+  .t-item.critical::before { transform: scale(1.3); }
+  .t-item.buffer { background: #FBF8F2; border-style: dashed; }
+  .t-item .t-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .t-item .t-title { font-size: 14px; font-weight: 600; }
+  .t-item .t-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Task card */
+  .task-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 12px; background: #fff; margin-bottom: 8px; }
+  .checkbox-btn { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--rule-2); flex-shrink: 0; cursor: pointer; background: #fff; padding: 0; position: relative; }
+  .checkbox-btn.done { background: var(--ink); border-color: var(--ink); }
+  .checkbox-btn.done::after { content: ''; position: absolute; width: 9px; height: 5px; border: 2px solid #FBF7EE; border-top: none; border-right: none; transform: rotate(-45deg); top: 4px; left: 3px; }
+  .task-card .t-body { flex: 1; min-width: 0; }
+  .task-card .t-name { font-size: 14px; }
+  .task-card.done .t-name { text-decoration: line-through; color: var(--muted); }
+  .task-card .t-due { font-size: 12px; color: var(--muted); }
+  .task-card .t-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .15s ease; }
+  .task-card:hover .t-actions { opacity: 1; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #FBF7EE; padding: 12px 20px; border-radius: 10px; font-size: 13px; box-shadow: var(--shadow-pop); z-index: 100; animation: rise .25s ease; }
+  @keyframes rise { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+  /* Mood tabs */
+  .mood-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .mood-tab { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--rule-2); background: #fff; font-size: 12px; color: var(--ink-muted); cursor: pointer; }
+  .mood-tab.active { background: var(--ink); color: #FBF7EE; border-color: var(--ink); }
+
+  /* Vendor / table cards */
+  .vendor-card { background: #fff; border: 1px solid var(--rule); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+  .vendor-card .v-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 6px; gap: 12px; }
+  .vendor-card .v-name { font-family: Georgia, serif; font-style: italic; font-size: 18px; }
+  .vendor-card .v-meta { font-size: 12px; color: var(--muted); }
+
+  /* Filter bar */
+  .filterbar { display: flex; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--rule); background: #FBF8F2; align-items: center; flex-wrap: wrap; }
+  .filterbar input { border: 1px solid var(--rule-2); border-radius: 8px; padding: 6px 12px; font-size: 13px; min-width: 240px; }
+  .filterbar select { border: 1px solid var(--rule-2); border-radius: 8px; padding: 6px 10px; font-size: 12px; background: #fff; }
+
+  @media (max-width: 880px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; flex-direction: row; overflow-x: auto; padding: 12px; gap: 8px; }
+    .sidebar .brand, .sidebar .brand-sub, .sidebar .group, .sidebar .couple { display: none; }
+    .sidebar .nav { flex-direction: row; gap: 6px; flex: 1; }
+    .nav button { padding: 8px 12px; font-size: 12px; }
+    .nav .badge { display: none; }
+    .main { padding: 20px; }
+    .grid.cols-3, .grid.cols-4, .grid.cols-2 { grid-template-columns: 1fr; }
+    .mood-grid { columns: 2; }
+    .form-grid { grid-template-columns: 1fr; }
+    .countdown { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root">
+  <div style="padding: 60px; text-align: center; color: #6B6E7A; font-family: Georgia, serif; font-style: italic;">Loading Aisle…</div>
+</div>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+// ---------- localStorage hook ----------
+function useLocalState(key, initial) {
+  const [val, setVal] = useState(() => {
+    try {
+      const saved = localStorage.getItem(key);
+      return saved !== null ? JSON.parse(saved) : initial;
+    } catch { return initial; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  }, [key, val]);
+  return [val, setVal];
+}
+
+// ---------- helpers ----------
+const uid = () => Math.random().toString(36).slice(2, 10);
+const gbp = (n) => "£" + Number(n || 0).toLocaleString("en-GB", { maximumFractionDigits: 0 });
+const initials = (name) => (name || "?").split(/\s+/).map(p => p[0]).slice(0, 2).join("").toUpperCase();
+const today = () => new Date().toISOString().slice(0, 10);
+
+function daysBetween(a, b) {
+  const ms = new Date(b) - new Date(a);
+  return Math.round(ms / (1000 * 60 * 60 * 24));
+}
+function fmtDate(d) {
+  if (!d) return "";
+  const dt = new Date(d);
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+function fmtDateLong(d) {
+  if (!d) return "";
+  const dt = new Date(d);
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+// ---------- seed data ----------
+const SEED = {
+  wedding: {
+    coupleA: "Priya", coupleB: "James",
+    date: "2026-09-12",
+    venue: "Daylesford Estate, Cotswolds",
+    ceremonyTime: "14:00",
+    budgetTotal: 38000,
+  },
+  guests: [
+    { id: uid(), firstName: "Anita", lastName: "Singh", household: "Singh family", side: "Priya", dayType: "Day", rsvp: "Accepted", dietary: ["vegetarian"], accessibility: [], notes: "Mother of the bride", invitationStatus: "Accepted", isChild: false, plusOne: false, accommodation: "Needs room", transport: "Driving", email: "anita@example.com", phone: "07700 900001", tableId: null },
+    { id: uid(), firstName: "Raj", lastName: "Singh", household: "Singh family", side: "Priya", dayType: "Day", rsvp: "Accepted", dietary: ["vegetarian"], accessibility: [], notes: "", invitationStatus: "Accepted", isChild: false, plusOne: false, accommodation: "Needs room", transport: "Driving", email: "raj@example.com", phone: "", tableId: null },
+    { id: uid(), firstName: "David", lastName: "Hall", household: "James's parents", side: "James", dayType: "Day", rsvp: "Accepted", dietary: [], accessibility: ["nut allergy"], notes: "Walking Priya down the aisle", invitationStatus: "Accepted", isChild: false, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Eleanor", lastName: "Hall", household: "James's parents", side: "James", dayType: "Day", rsvp: "Accepted", dietary: [], accessibility: [], notes: "", invitationStatus: "Accepted", isChild: false, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Hannah", lastName: "Khoury", household: "Maid of honour", side: "Priya", dayType: "Day", rsvp: "Accepted", dietary: ["vegan"], accessibility: [], notes: "Speech", invitationStatus: "Accepted", isChild: false, plusOne: true, accommodation: "Needs room", transport: "Train", email: "hannah@example.com", phone: "", tableId: null },
+    { id: uid(), firstName: "Tom", lastName: "Mitchell", household: "Uni friends", side: "Priya", dayType: "Day", rsvp: "Pending", dietary: [], accessibility: [], notes: "", invitationStatus: "Chased", isChild: false, plusOne: true, accommodation: "Needs room", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Sofia", lastName: "Mitchell", household: "Uni friends", side: "Priya", dayType: "Day", rsvp: "Pending", dietary: [], accessibility: [], notes: "Tom's plus-one", invitationStatus: "Chased", isChild: false, plusOne: false, accommodation: "Needs room", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Olivia", lastName: "Webb", household: "Work colleagues", side: "James", dayType: "Evening", rsvp: "Declined", dietary: [], accessibility: [], notes: "", invitationStatus: "Declined", isChild: false, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Liam", lastName: "Barnes", household: "Work colleagues", side: "James", dayType: "Evening", rsvp: "Pending", dietary: [], accessibility: ["step-free access"], notes: "Wheelchair user", invitationStatus: "Invitation sent", isChild: false, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Amelia", lastName: "Carter", household: "School friends", side: "Priya", dayType: "Day", rsvp: "Accepted", dietary: ["gluten-free"], accessibility: [], notes: "", invitationStatus: "Accepted", isChild: false, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Ben", lastName: "Carter", household: "School friends", side: "Priya", dayType: "Day", rsvp: "Accepted", dietary: [], accessibility: [], notes: "Amelia's husband", invitationStatus: "Accepted", isChild: false, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", tableId: null },
+    { id: uid(), firstName: "Lucy", lastName: "Carter", household: "School friends", side: "Priya", dayType: "Day", rsvp: "Accepted", dietary: [], accessibility: [], notes: "Age 6", invitationStatus: "Accepted", isChild: true, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", tableId: null },
+  ],
+  budgetCategories: [
+    { id: uid(), name: "Venue", cap: 13000, colour: "#1F2A44" },
+    { id: uid(), name: "Catering & drinks", cap: 9500, colour: "#9B5C4E" },
+    { id: uid(), name: "Photography & video", cap: 3800, colour: "#6C8C6E" },
+    { id: uid(), name: "Flowers & décor", cap: 2500, colour: "#B18C4E" },
+    { id: uid(), name: "Entertainment & music", cap: 1700, colour: "#C97C7C" },
+    { id: uid(), name: "Outfits", cap: 3000, colour: "#A8B4C7" },
+    { id: uid(), name: "Stationery", cap: 1000, colour: "#8FAA8F" },
+    { id: uid(), name: "Beauty", cap: 700, colour: "#D4B0A0" },
+    { id: uid(), name: "Transport", cap: 600, colour: "#B7A47C" },
+    { id: uid(), name: "Gifts & favours", cap: 500, colour: "#9286A0" },
+    { id: uid(), name: "Contingency", cap: 1700, colour: "#6B6E7A" },
+  ],
+};
+
+// Add budget items now that categories exist
+(() => {
+  const cat = (n) => SEED.budgetCategories.find(c => c.name === n).id;
+  SEED.budgetItems = [
+    { id: uid(), categoryId: cat("Venue"), name: "Venue hire", estimated: 12800, quoted: 12800, paid: 12800, dueDate: "2025-12-01", vendor: "Daylesford Estate", status: "Paid" },
+    { id: uid(), categoryId: cat("Catering & drinks"), name: "Catering package", estimated: 7200, quoted: 7200, paid: 1000, dueDate: "2026-08-22", vendor: "Quintessential Catering", status: "Booked" },
+    { id: uid(), categoryId: cat("Catering & drinks"), name: "Drinks & corkage", estimated: 1000, quoted: 1000, paid: 0, dueDate: "2026-08-22", vendor: "Quintessential Catering", status: "Booked" },
+    { id: uid(), categoryId: cat("Photography & video"), name: "Photographer + 2nd shooter", estimated: 2800, quoted: 2800, paid: 700, dueDate: "2026-09-05", vendor: "Elena Marsh Photography", status: "Booked" },
+    { id: uid(), categoryId: cat("Photography & video"), name: "Engagement shoot", estimated: 400, quoted: 400, paid: 400, dueDate: "2026-04-15", vendor: "Elena Marsh Photography", status: "Paid" },
+    { id: uid(), categoryId: cat("Flowers & décor"), name: "Florals & arch", estimated: 2400, quoted: 2400, paid: 600, dueDate: "2026-05-28", vendor: "Bloomsbury Florals", status: "Booked" },
+    { id: uid(), categoryId: cat("Entertainment & music"), name: "Mayfair Trio (ceremony)", estimated: 800, quoted: 800, paid: 200, dueDate: "2026-09-12", vendor: "Mayfair Trio", status: "Booked" },
+    { id: uid(), categoryId: cat("Entertainment & music"), name: "DJ Sam (evening)", estimated: 1000, quoted: 1000, paid: 250, dueDate: "2026-09-12", vendor: "DJ Sam", status: "Booked" },
+    { id: uid(), categoryId: cat("Outfits"), name: "Dress + alterations", estimated: 2200, quoted: 2200, paid: 1100, dueDate: "2026-08-15", vendor: "Hampstead Bridal", status: "Booked" },
+    { id: uid(), categoryId: cat("Outfits"), name: "Suit (groom)", estimated: 600, quoted: 600, paid: 0, dueDate: "2026-08-01", vendor: "Suitsupply", status: "Planning" },
+    { id: uid(), categoryId: cat("Stationery"), name: "Save the dates", estimated: 180, quoted: 180, paid: 180, dueDate: "2025-11-01", vendor: "Hand & Press", status: "Paid" },
+  ];
+})();
+
+SEED.tasks = [
+  { id: uid(), title: "Confirm cake flavours with Patisserie Marie", category: "Vendors", priority: "Medium", status: "Done", assignee: "Priya", dueDate: "2026-05-19", notes: "" },
+  { id: uid(), title: "Book hair & makeup trial", category: "Beauty", priority: "Medium", status: "Done", assignee: "Priya", dueDate: "2026-05-20", notes: "" },
+  { id: uid(), title: "Order bridesmaids' gifts", category: "Gifts", priority: "Low", status: "Done", assignee: "James", dueDate: "2026-05-20", notes: "" },
+  { id: uid(), title: "Pay florist deposit balance (£1,800)", category: "Money", priority: "High", status: "Todo", assignee: "Priya", dueDate: "2026-05-28", notes: "Bloomsbury Florals" },
+  { id: uid(), title: "Send chase to outstanding RSVPs", category: "Guests", priority: "Medium", status: "Todo", assignee: "Hannah", dueDate: "2026-05-29", notes: "18 outstanding" },
+  { id: uid(), title: "Finalise menu choices with Quintessential", category: "Vendors", priority: "Medium", status: "Todo", assignee: "Priya & James", dueDate: "2026-06-01", notes: "" },
+  { id: uid(), title: "Draft seating plan v1", category: "Guests", priority: "Low", status: "Todo", assignee: "Priya", dueDate: "2026-06-08", notes: "" },
+  { id: uid(), title: "Final fittings booked", category: "Outfits", priority: "Medium", status: "Todo", assignee: "Priya", dueDate: "2026-08-29", notes: "" },
+  { id: uid(), title: "Confirm final numbers with venue", category: "Vendors", priority: "High", status: "Todo", assignee: "Priya", dueDate: "2026-08-29", notes: "Hard deadline" },
+  { id: uid(), title: "Write vows", category: "Personal", priority: "Medium", status: "Todo", assignee: "Priya & James", dueDate: "2026-08-15", notes: "" },
+];
+
+SEED.schedule = [
+  { id: uid(), time: "08:30", title: "Hair & makeup begins", location: "Bridal suite", responsible: "Lara Co. (HMU)", notes: "4 hours", critical: false, buffer: false },
+  { id: uid(), time: "11:00", title: "Florists arrive for setup", location: "Ceremony lawn & barn", responsible: "Bloomsbury Florals", notes: "3 hours", critical: false, buffer: false },
+  { id: uid(), time: "12:30", title: "Photographer first look", location: "Walled garden", responsible: "Elena Marsh", notes: "30 minutes", critical: false, buffer: false },
+  { id: uid(), time: "13:00", title: "Buffer + couple breathing room", location: "Bridal suite", responsible: "—", notes: "Intentional 30-min cushion", critical: false, buffer: true },
+  { id: uid(), time: "13:30", title: "Guests seated for ceremony", location: "Ceremony lawn", responsible: "Ushers: Tom, Sam, Charlie", notes: "", critical: true, buffer: false },
+  { id: uid(), time: "14:00", title: "Ceremony begins", location: "Ceremony lawn", responsible: "Registrar: Eleanor Pierce", notes: "Music: Mayfair Trio", critical: true, buffer: false },
+  { id: uid(), time: "14:45", title: "Drinks reception", location: "Walled garden", responsible: "Quintessential Catering", notes: "90 minutes", critical: false, buffer: false },
+  { id: uid(), time: "16:30", title: "Wedding breakfast", location: "Main barn", responsible: "Quintessential Catering", notes: "Speeches between courses", critical: false, buffer: false },
+  { id: uid(), time: "19:30", title: "First dance", location: "Main barn", responsible: "DJ Sam", notes: "\"At Last\" — Etta James", critical: false, buffer: false },
+  { id: uid(), time: "23:30", title: "Last song & sparklers", location: "Courtyard", responsible: "DJ Sam", notes: "\"I Will Always Love You\"", critical: false, buffer: false },
+];
+
+SEED.music = [
+  { id: uid(), moment: "Processional", title: "Canon in D", artist: "Pachelbel", performer: "Mayfair Trio (live)", list: "must", notes: "" },
+  { id: uid(), moment: "Signing the register", title: "Clair de Lune", artist: "Debussy", performer: "Mayfair Trio", list: "must", notes: "" },
+  { id: uid(), moment: "Recessional", title: "Here Comes the Sun", artist: "The Beatles", performer: "Mayfair Trio (acoustic)", list: "must", notes: "" },
+  { id: uid(), moment: "Drinks reception", title: "Fly Me to the Moon", artist: "Frank Sinatra", performer: "Recorded playlist", list: "must", notes: "Set the tone" },
+  { id: uid(), moment: "First dance", title: "At Last", artist: "Etta James", performer: "DJ Sam", list: "must", notes: "" },
+  { id: uid(), moment: "Last song", title: "I Will Always Love You", artist: "Whitney Houston", performer: "DJ Sam", list: "must", notes: "Sparkler send-off" },
+  { id: uid(), moment: "Party set", title: "Don't Stop Me Now", artist: "Queen", performer: "DJ Sam", list: "neither", notes: "" },
+  { id: uid(), moment: "Do-not-play", title: "YMCA", artist: "Village People", performer: "—", list: "donot", notes: "James says no" },
+];
+
+SEED.mood = [
+  { id: uid(), category: "Flowers", caption: "Wildflower bouquet", url: "", colours: ["#E6CFC8", "#9B5C4E", "#6C8C6E", "#B18C4E"], love: "love" },
+  { id: uid(), category: "Stationery", caption: "Invitation suite", url: "", colours: ["#F8F4EE", "#1F2A44", "#B18C4E"], love: "love" },
+  { id: uid(), category: "Cakes", caption: "Three-tier naked cake", url: "", colours: ["#FBF8F2", "#B18C4E", "#6C8C6E"], love: "maybe" },
+  { id: uid(), category: "Décor", caption: "Festoon lighting", url: "", colours: ["#1F2A44", "#FBE89E", "#9B5C4E"], love: "love" },
+  { id: uid(), category: "Table styling", caption: "Long banquet tables", url: "", colours: ["#FBF8F2", "#9B5C4E", "#6C8C6E"], love: "love" },
+  { id: uid(), category: "Venues", caption: "Outdoor ceremony arch", url: "", colours: ["#6C8C6E", "#F8F4EE", "#9B5C4E"], love: "love" },
+];
+
+SEED.tables = [
+  { id: uid(), label: "Top Table", shape: "rect", capacity: 8, notes: "Couple, parents, MOH, best man" },
+  { id: uid(), label: "Table 2", shape: "round", capacity: 8, notes: "Singh family + close" },
+  { id: uid(), label: "Table 3", shape: "round", capacity: 8, notes: "Hall family" },
+  { id: uid(), label: "Table 4", shape: "round", capacity: 8, notes: "Uni friends" },
+  { id: uid(), label: "Table 5", shape: "round", capacity: 8, notes: "School friends" },
+  { id: uid(), label: "Table 6", shape: "round", capacity: 8, notes: "Family friends" },
+];
+
+SEED.vendors = [
+  { id: uid(), name: "Daylesford Estate", category: "Venue", contact: "Sarah Wells", email: "events@daylesford.example", phone: "", quote: 12800, deposit: 12800, balance: 0, status: "Booked", rating: 5, notes: "Final walkthrough booked for 5 Sep" },
+  { id: uid(), name: "Quintessential Catering", category: "Catering", contact: "Marco Bellini", email: "marco@quint.example", phone: "", quote: 8200, deposit: 1000, balance: 7200, status: "Booked", rating: 5, notes: "Menu tasting June 1st" },
+  { id: uid(), name: "Elena Marsh Photography", category: "Photography", contact: "Elena Marsh", email: "elena@marshphoto.example", phone: "", quote: 3200, deposit: 1100, balance: 2100, status: "Booked", rating: 5, notes: "8 hours + engagement shoot" },
+  { id: uid(), name: "Bloomsbury Florals", category: "Flowers", contact: "Iris Doe", email: "iris@bloomsbury.example", phone: "", quote: 2400, deposit: 600, balance: 1800, status: "Booked", rating: 4, notes: "Balance due 28 May" },
+];
+
+// ============ Modal ============
+function Modal({ title, onClose, children, footer, lg }) {
+  return (
+    <div className="scrim" onClick={onClose}>
+      <div className={"modal" + (lg ? " lg" : "")} onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head">
+          <h2>{title}</h2>
+          <button className="close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">{children}</div>
+        {footer && <div className="modal-foot">{footer}</div>}
+      </div>
+    </div>
+  );
+}
+
+// ============ Toast ============
+function Toast({ message, onClose }) {
+  useEffect(() => {
+    if (!message) return;
+    const t = setTimeout(onClose, 2400);
+    return () => clearTimeout(t);
+  }, [message, onClose]);
+  if (!message) return null;
+  return <div className="toast">{message}</div>;
+}
+
+// ============ Sidebar ============
+function Sidebar({ screen, setScreen, wedding, counts }) {
+  const items = [
+    { id: "home", label: "Home", ico: "⌂" },
+    { id: "plan", label: "Plan", ico: "✓", badge: counts.openTasks },
+    { id: "guests", label: "Guests", ico: "♔", badge: counts.guests },
+    { id: "tables", label: "Tables", ico: "◯" },
+    { id: "money", label: "Money", ico: "£" },
+    { id: "day", label: "Day", ico: "☀" },
+    { id: "music", label: "Music", ico: "♪" },
+    { id: "mood", label: "Mood", ico: "✿" },
+    { id: "vendors", label: "Vendors", ico: "✎" },
+  ];
+  return (
+    <aside className="sidebar">
+      <div>
+        <div className="brand">
+          <span className="logo">Aisle</span>
+          <span className="dot"></span>
+        </div>
+        <div className="brand-sub">Wedding planning</div>
+      </div>
+      <nav className="nav">
+        <div className="group">Workspace</div>
+        {items.map(i => (
+          <button key={i.id} className={screen === i.id ? "active" : ""} onClick={() => setScreen(i.id)}>
+            <span className="ico">{i.ico}</span>
+            <span>{i.label}</span>
+            {i.badge != null && i.badge > 0 && <span className="badge">{i.badge}</span>}
+          </button>
+        ))}
+        <div className="group">Other</div>
+        <button className={screen === "settings" ? "active" : ""} onClick={() => setScreen("settings")}>
+          <span className="ico">⚙</span><span>Settings</span>
+        </button>
+      </nav>
+      <div className="couple">
+        <div className="avatar-stack">
+          <div className="avatar">{(wedding.coupleA || "?")[0]}</div>
+          <div className="avatar">{(wedding.coupleB || "?")[0]}</div>
+        </div>
+        <div className="couple-meta">
+          <strong>{wedding.coupleA} & {wedding.coupleB}</strong>
+          <span>{fmtDate(wedding.date)}</span>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+// ============ Home ============
+function Home({ wedding, guests, budgetItems, budgetCategories, tasks, mood, setScreen }) {
+  const days = daysBetween(today(), wedding.date);
+  const totalCommitted = budgetItems.reduce((s, b) => s + Number(b.estimated || 0), 0);
+  const totalPaid = budgetItems.reduce((s, b) => s + Number(b.paid || 0), 0);
+  const rsvp = useMemo(() => {
+    const acc = guests.filter(g => g.rsvp === "Accepted").length;
+    const dec = guests.filter(g => g.rsvp === "Declined").length;
+    const pen = guests.filter(g => g.rsvp === "Pending").length;
+    return { accepted: acc, declined: dec, pending: pen, total: guests.length };
+  }, [guests]);
+  const nextPayment = useMemo(() => {
+    const unpaid = budgetItems.filter(b => Number(b.paid) < Number(b.estimated) && b.dueDate)
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+    return unpaid[0];
+  }, [budgetItems]);
+  const dueToday = today();
+  const next = useMemo(() => {
+    return tasks.filter(t => t.status !== "Done")
+      .sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""))
+      .slice(0, 5);
+  }, [tasks]);
+  const donutData = useMemo(() => {
+    const map = {};
+    budgetItems.forEach(b => { map[b.categoryId] = (map[b.categoryId] || 0) + Number(b.estimated || 0); });
+    return budgetCategories.map(c => ({ ...c, value: map[c.id] || 0 })).filter(c => c.value > 0);
+  }, [budgetItems, budgetCategories]);
+  const total = donutData.reduce((s, d) => s + d.value, 0) || 1;
+  let offset = 0;
+
+  return (
+    <>
+      <div className="countdown">
+        <div>
+          <div className="greet">Good morning, {wedding.coupleA}</div>
+          <div className="who">{days > 0 ? `${days} days until the day` : days === 0 ? "Today's the day" : "After the day"}</div>
+          <div className="when">{fmtDateLong(wedding.date)} · {wedding.venue}</div>
+        </div>
+        <div className="days">
+          <div className="n">{Math.max(days, 0)}</div>
+          <div className="l">days to go</div>
+        </div>
+      </div>
+
+      <div className="grid cols-4">
+        <div className="card">
+          <h3>Budget</h3>
+          <div className="big">{gbp(totalCommitted)}</div>
+          <div className="delta">of {gbp(wedding.budgetTotal)} · <span style={{ color: totalCommitted > wedding.budgetTotal ? "var(--terracotta)" : "var(--sage)" }}>{totalCommitted > wedding.budgetTotal ? "over" : "on track"}</span></div>
+          <div className="progress"><div style={{ width: Math.min(100, (totalCommitted / Math.max(1, wedding.budgetTotal)) * 100) + "%" }}></div></div>
+        </div>
+        <div className="card">
+          <h3>RSVPs</h3>
+          <div className="big">{rsvp.accepted} / {rsvp.total}</div>
+          <div className="delta">{rsvp.declined} declined · {rsvp.pending} pending</div>
+          <div className="progress"><div className="sage" style={{ width: rsvp.total ? (rsvp.accepted / rsvp.total) * 100 + "%" : "0%" }}></div></div>
+        </div>
+        <div className="card">
+          <h3>Next payment</h3>
+          <div className="big">{nextPayment ? gbp(Number(nextPayment.estimated) - Number(nextPayment.paid)) : "—"}</div>
+          <div className="delta warn">{nextPayment ? `${nextPayment.vendor || nextPayment.name} · due ${fmtDate(nextPayment.dueDate)}` : "Nothing due"}</div>
+        </div>
+        <div className="card">
+          <h3>Open tasks</h3>
+          <div className="big">{tasks.filter(t => t.status !== "Done").length}</div>
+          <div className="delta">{tasks.filter(t => t.status === "Done").length} done</div>
+        </div>
+      </div>
+
+      <div className="section-h">
+        <h2>What's next</h2>
+        <a onClick={() => setScreen("plan")}>See all →</a>
+      </div>
+      <div className="card" style={{ padding: "8px 22px" }}>
+        {next.length === 0 ? (
+          <div className="empty">
+            <div className="e-title">All caught up</div>
+            <div className="e-sub">No tasks open. Add one from the Plan tab.</div>
+          </div>
+        ) : (
+          <div className="list">
+            {next.map(t => (
+              <div key={t.id} className="list-row">
+                <div className="icon-tile">{t.category[0]}</div>
+                <div className="body">
+                  <div className="title">{t.title}</div>
+                  <div className="meta">{t.assignee} · {t.dueDate ? "due " + fmtDate(t.dueDate) : "no date"}</div>
+                </div>
+                <span className={"pill " + (t.priority === "High" ? "terra" : t.priority === "Medium" ? "gold" : "grey")}>{t.priority}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="grid cols-2" style={{ marginTop: 24 }}>
+        <div className="card">
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
+            <h2 style={{ margin: 0, fontSize: 18, fontStyle: "italic" }}>Budget at a glance</h2>
+            <a style={{ color: "var(--terracotta)", fontSize: 12, cursor: "pointer" }} onClick={() => setScreen("money")}>Open budget →</a>
+          </div>
+          <div className="donut-wrap">
+            <div className="donut">
+              <svg viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F2EBDF" strokeWidth="3.5"/>
+                {donutData.map(d => {
+                  const len = (d.value / total) * 100;
+                  const circle = <circle key={d.id} cx="18" cy="18" r="15.9" fill="none" stroke={d.colour} strokeWidth="3.5" strokeDasharray={`${len.toFixed(2)} ${(100 - len).toFixed(2)}`} strokeDashoffset={-offset}/>;
+                  offset += len;
+                  return circle;
+                })}
+              </svg>
+              <div className="center">
+                <div className="big">{Math.round((totalCommitted / wedding.budgetTotal) * 100)}%</div>
+                <div className="lbl">committed</div>
+              </div>
+            </div>
+            <div className="legend">
+              {donutData.slice(0, 6).map(d => (
+                <div key={d.id} className="row">
+                  <span className="swatch" style={{ background: d.colour }}></span>
+                  <span className="name">{d.name}</span>
+                  <span className="val">{gbp(d.value)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
+            <h2 style={{ margin: 0, fontSize: 18, fontStyle: "italic" }}>Recently saved</h2>
+            <a style={{ color: "var(--terracotta)", fontSize: 12, cursor: "pointer" }} onClick={() => setScreen("mood")}>Mood board →</a>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {mood.slice(0, 4).map(m => (
+              <MoodPreview key={m.id} m={m} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ============ Mood preview SVG ============
+function MoodPreview({ m, small }) {
+  if (m.url) {
+    return <div style={{ borderRadius: 10, overflow: "hidden", aspectRatio: "1" }}><img src={m.url} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt={m.caption}/></div>;
+  }
+  const cs = m.colours && m.colours.length ? m.colours : ["#E6CFC8", "#9B5C4E", "#6C8C6E"];
+  return (
+    <div style={{ borderRadius: 10, overflow: "hidden", aspectRatio: "1" }}>
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
+        <rect width="100" height="100" fill={cs[0]}/>
+        <circle cx="50" cy="55" r="22" fill={cs[1]} opacity="0.5"/>
+        {cs[2] && <ellipse cx="50" cy="75" rx="28" ry="5" fill={cs[2]}/>}
+        {cs[3] && <circle cx="65" cy="45" r="8" fill={cs[3]}/>}
+        <text x="50" y="92" textAnchor="middle" fontFamily="Georgia" fontStyle="italic" fontSize="7" fill="#1F2A44">{(m.category || "").toLowerCase()}</text>
+      </svg>
+    </div>
+  );
+}
+
+// ============ Guests ============
+function GuestsScreen({ guests, setGuests, tables, showToast }) {
+  const [filter, setFilter] = useState({ q: "", rsvp: "all", day: "all" });
+  const [editing, setEditing] = useState(null); // guest or "new"
+  const blank = { firstName: "", lastName: "", household: "", side: "Both", dayType: "Day", rsvp: "Pending", invitationStatus: "Not sent", dietary: [], accessibility: [], isChild: false, plusOne: false, accommodation: "Has own plans", transport: "Driving", email: "", phone: "", notes: "" };
+
+  const filtered = guests.filter(g => {
+    if (filter.q) {
+      const q = filter.q.toLowerCase();
+      if (![g.firstName, g.lastName, g.household, g.notes].join(" ").toLowerCase().includes(q)) return false;
+    }
+    if (filter.rsvp !== "all" && g.rsvp !== filter.rsvp) return false;
+    if (filter.day !== "all" && g.dayType !== filter.day) return false;
+    return true;
+  });
+
+  const counts = {
+    accepted: guests.filter(g => g.rsvp === "Accepted").length,
+    declined: guests.filter(g => g.rsvp === "Declined").length,
+    pending: guests.filter(g => g.rsvp === "Pending").length,
+    day: guests.filter(g => g.dayType === "Day" || g.dayType === "Both").length,
+    evening: guests.filter(g => g.dayType === "Evening" || g.dayType === "Both").length,
+    children: guests.filter(g => g.isChild).length,
+    dietary: guests.filter(g => (g.dietary && g.dietary.length) || (g.accessibility && g.accessibility.length)).length,
+  };
+
+  function save(g) {
+    if (g.id) {
+      setGuests(gs => gs.map(x => x.id === g.id ? g : x));
+      showToast("Guest updated");
+    } else {
+      setGuests(gs => [...gs, { ...g, id: uid() }]);
+      showToast("Guest added");
+    }
+    setEditing(null);
+  }
+  function remove(id) {
+    if (confirm("Remove this guest?")) {
+      setGuests(gs => gs.filter(g => g.id !== id));
+      showToast("Guest removed");
+    }
+  }
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Guests</h1>
+          <div className="sub">{guests.length} on the list · {counts.accepted} accepted · {counts.declined} declined · {counts.pending} pending</div>
+        </div>
+        <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add guest</button>
+      </div>
+
+      <div className="grid cols-4" style={{ marginBottom: 18 }}>
+        <div className="card"><h3>Day guests</h3><div className="big">{counts.day}</div><div className="delta">includes 'both'</div></div>
+        <div className="card"><h3>Evening guests</h3><div className="big">{counts.evening}</div><div className="delta">includes 'both'</div></div>
+        <div className="card"><h3>Children</h3><div className="big">{counts.children}</div><div className="delta">on the list</div></div>
+        <div className="card"><h3>Dietary or access</h3><div className="big">{counts.dietary}</div><div className="delta">flagged</div></div>
+      </div>
+
+      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+        <div className="filterbar">
+          <input placeholder="Search guests…" value={filter.q} onChange={e => setFilter({ ...filter, q: e.target.value })}/>
+          <select value={filter.rsvp} onChange={e => setFilter({ ...filter, rsvp: e.target.value })}>
+            <option value="all">RSVP: all</option>
+            <option>Accepted</option><option>Declined</option><option>Pending</option>
+          </select>
+          <select value={filter.day} onChange={e => setFilter({ ...filter, day: e.target.value })}>
+            <option value="all">Day type: all</option>
+            <option>Day</option><option>Evening</option><option>Both</option>
+          </select>
+          <span style={{ flex: 1 }}></span>
+          <span style={{ fontSize: 12, color: "var(--muted)" }}>{filtered.length} shown</span>
+        </div>
+        {filtered.length === 0 ? (
+          <div className="empty">
+            <div className="e-title">No guests match</div>
+            <div className="e-sub">Try clearing the filters, or add your first guest.</div>
+            <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add guest</button>
+          </div>
+        ) : (
+          <table className="aisle">
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Household</th>
+                <th>Day type</th>
+                <th>RSVP</th>
+                <th>Tags</th>
+                <th>Table</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(g => {
+                const t = tables.find(x => x.id === g.tableId);
+                const allTags = [
+                  ...(g.dietary || []).map(d => ({ t: d, allergy: false })),
+                  ...(g.accessibility || []).map(a => ({ t: a, allergy: true })),
+                ];
+                return (
+                  <tr key={g.id}>
+                    <td><span className="guest-name"><span className="guest-avatar">{initials(g.firstName + " " + g.lastName)}</span><strong>{g.firstName} {g.lastName}</strong>{g.isChild && <span className="tag" style={{ marginLeft: 8 }}>child</span>}</span></td>
+                    <td>{g.household}</td>
+                    <td><span className="pill grey">{g.dayType}</span></td>
+                    <td>
+                      <select value={g.rsvp} onChange={e => setGuests(gs => gs.map(x => x.id === g.id ? { ...x, rsvp: e.target.value, invitationStatus: e.target.value !== "Pending" ? e.target.value : x.invitationStatus } : x))} style={{ border: "1px solid var(--rule-2)", padding: "3px 8px", borderRadius: 6, fontSize: 12, background: "#fff" }}>
+                        <option>Pending</option><option>Accepted</option><option>Declined</option>
+                      </select>
+                    </td>
+                    <td>
+                      <div className="tags">
+                        {allTags.map((tt, i) => <span key={i} className={"tag" + (tt.allergy ? " allergy" : "")}>{tt.t}</span>)}
+                      </div>
+                    </td>
+                    <td>
+                      <select value={g.tableId || ""} onChange={e => setGuests(gs => gs.map(x => x.id === g.id ? { ...x, tableId: e.target.value || null } : x))} style={{ border: "1px solid var(--rule-2)", padding: "3px 8px", borderRadius: 6, fontSize: 12, background: "#fff" }}>
+                        <option value="">—</option>
+                        {tables.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+                      </select>
+                    </td>
+                    <td>
+                      <button className="btn-ghost btn-sm" onClick={() => setEditing(g)}>Edit</button>
+                      <button className="btn-ghost btn-sm" onClick={() => remove(g.id)} style={{ color: "var(--terracotta)" }}>Remove</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {editing && <GuestForm guest={editing} onSave={save} onClose={() => setEditing(null)} />}
+    </>
+  );
+}
+
+function GuestForm({ guest, onSave, onClose }) {
+  const [g, setG] = useState(guest);
+  function field(k, v) { setG({ ...g, [k]: v }); }
+  function tagToggle(group, tag) {
+    const cur = g[group] || [];
+    const has = cur.includes(tag);
+    setG({ ...g, [group]: has ? cur.filter(x => x !== tag) : [...cur, tag] });
+  }
+  const dietaryOpts = ["vegetarian", "vegan", "gluten-free", "dairy-free", "pescatarian", "halal", "kosher"];
+  const accessOpts = ["nut allergy", "shellfish allergy", "step-free access", "hearing loop", "BSL interpreter"];
+  return (
+    <Modal title={g.id ? "Edit guest" : "Add guest"} onClose={onClose} lg
+      footer={<><button className="btn" onClick={onClose}>Cancel</button><button className="btn btn-primary" onClick={() => onSave(g)} disabled={!g.firstName}>Save guest</button></>}
+    >
+      <div className="form-grid">
+        <div className="field"><label>First name</label><input value={g.firstName || ""} onChange={e => field("firstName", e.target.value)} autoFocus/></div>
+        <div className="field"><label>Last name</label><input value={g.lastName || ""} onChange={e => field("lastName", e.target.value)}/></div>
+        <div className="field"><label>Household / group</label><input value={g.household || ""} onChange={e => field("household", e.target.value)} placeholder="e.g., Singh family"/></div>
+        <div className="field"><label>Side</label>
+          <select value={g.side} onChange={e => field("side", e.target.value)}>
+            <option>Priya</option><option>James</option><option>Both</option>
+          </select>
+        </div>
+        <div className="field"><label>Day type</label>
+          <select value={g.dayType} onChange={e => field("dayType", e.target.value)}>
+            <option>Day</option><option>Evening</option><option>Both</option>
+          </select>
+        </div>
+        <div className="field"><label>RSVP</label>
+          <select value={g.rsvp} onChange={e => field("rsvp", e.target.value)}>
+            <option>Pending</option><option>Accepted</option><option>Declined</option>
+          </select>
+        </div>
+        <div className="field"><label>Invitation status</label>
+          <select value={g.invitationStatus} onChange={e => field("invitationStatus", e.target.value)}>
+            <option>Not sent</option><option>Save the date sent</option><option>Invitation sent</option><option>Chased</option><option>Accepted</option><option>Declined</option><option>Thank-you sent</option>
+          </select>
+        </div>
+        <div className="field"><label>Email</label><input value={g.email || ""} onChange={e => field("email", e.target.value)}/></div>
+        <div className="field"><label>Phone</label><input value={g.phone || ""} onChange={e => field("phone", e.target.value)}/></div>
+        <div className="field"><label>Accommodation</label>
+          <select value={g.accommodation} onChange={e => field("accommodation", e.target.value)}>
+            <option>Has own plans</option><option>Needs room</option><option>Staying at venue</option>
+          </select>
+        </div>
+        <div className="field"><label>Transport</label>
+          <select value={g.transport} onChange={e => field("transport", e.target.value)}>
+            <option>Driving</option><option>Train</option><option>Needs shuttle</option><option>Staying on-site</option>
+          </select>
+        </div>
+        <div className="field"><label className="checkbox-row"><input type="checkbox" checked={!!g.isChild} onChange={e => field("isChild", e.target.checked)}/> Child</label></div>
+        <div className="field"><label className="checkbox-row"><input type="checkbox" checked={!!g.plusOne} onChange={e => field("plusOne", e.target.checked)}/> Plus-one allowed</label></div>
+        <div className="field full"><label>Dietary</label>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {dietaryOpts.map(o => (
+              <button key={o} type="button" onClick={() => tagToggle("dietary", o)} style={{ padding: "5px 10px", fontSize: 12, borderRadius: 999, border: "1px solid var(--rule-2)", background: (g.dietary || []).includes(o) ? "var(--ink)" : "#fff", color: (g.dietary || []).includes(o) ? "#FBF7EE" : "var(--ink)" }}>{o}</button>
+            ))}
+          </div>
+        </div>
+        <div className="field full"><label>Allergies & accessibility</label>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {accessOpts.map(o => (
+              <button key={o} type="button" onClick={() => tagToggle("accessibility", o)} style={{ padding: "5px 10px", fontSize: 12, borderRadius: 999, border: "1px solid var(--rule-2)", background: (g.accessibility || []).includes(o) ? "var(--terracotta)" : "#fff", color: (g.accessibility || []).includes(o) ? "#fff" : "var(--ink)" }}>{o}</button>
+            ))}
+          </div>
+        </div>
+        <div className="field full"><label>Notes</label><textarea value={g.notes || ""} onChange={e => field("notes", e.target.value)} placeholder="Anything to remember"/></div>
+      </div>
+    </Modal>
+  );
+}
+
+// ============ Money ============
+function MoneyScreen({ wedding, setWedding, budgetCategories, setBudgetCategories, budgetItems, setBudgetItems, showToast }) {
+  const [editing, setEditing] = useState(null);
+  const [editCat, setEditCat] = useState(null);
+  const blank = { categoryId: budgetCategories[0]?.id || "", name: "", estimated: 0, quoted: 0, paid: 0, dueDate: "", vendor: "", status: "Planning" };
+
+  const totalCommitted = budgetItems.reduce((s, b) => s + Number(b.estimated || 0), 0);
+  const totalPaid = budgetItems.reduce((s, b) => s + Number(b.paid || 0), 0);
+  const remaining = wedding.budgetTotal - totalCommitted;
+
+  function saveItem(it) {
+    if (it.id) setBudgetItems(items => items.map(x => x.id === it.id ? it : x));
+    else setBudgetItems(items => [...items, { ...it, id: uid() }]);
+    showToast(it.id ? "Line updated" : "Line added");
+    setEditing(null);
+  }
+  function removeItem(id) {
+    if (confirm("Remove this line item?")) {
+      setBudgetItems(items => items.filter(x => x.id !== id));
+      showToast("Line removed");
+    }
+  }
+  function saveCat(c) {
+    if (c.id) setBudgetCategories(cs => cs.map(x => x.id === c.id ? c : x));
+    else setBudgetCategories(cs => [...cs, { ...c, id: uid() }]);
+    showToast(c.id ? "Category updated" : "Category added");
+    setEditCat(null);
+  }
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Money</h1>
+          <div className="sub">{gbp(totalCommitted)} committed · {gbp(wedding.budgetTotal)} budget · {gbp(remaining)} remaining</div>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="btn" onClick={() => setEditCat({ name: "", cap: 0, colour: "#1F2A44" })}>+ Category</button>
+          <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Line item</button>
+        </div>
+      </div>
+
+      <div className="grid cols-4">
+        <div className="card"><h3>Total budget</h3><div className="big">{gbp(wedding.budgetTotal)}</div><div className="delta">Edit in Settings</div></div>
+        <div className="card"><h3>Committed</h3><div className="big">{gbp(totalCommitted)}</div><div className="delta">via {budgetItems.length} line items</div></div>
+        <div className="card"><h3>Paid so far</h3><div className="big">{gbp(totalPaid)}</div><div className="delta">{Math.round(totalPaid / Math.max(1, totalCommitted) * 100)}% of committed</div></div>
+        <div className="card"><h3>Remaining</h3><div className="big" style={{ color: remaining < 0 ? "var(--terracotta)" : "var(--ink)" }}>{gbp(remaining)}</div><div className={"delta" + (remaining < 0 ? " warn" : " up")}>{remaining < 0 ? "Over budget" : Math.round(remaining / Math.max(1, wedding.budgetTotal) * 100) + "% of budget"}</div></div>
+      </div>
+
+      <div className="section-h"><h2>Categories</h2></div>
+      <div className="card" style={{ padding: "8px 22px" }}>
+        <div className="list">
+          {budgetCategories.map(c => {
+            const items = budgetItems.filter(b => b.categoryId === c.id);
+            const sum = items.reduce((s, b) => s + Number(b.estimated || 0), 0);
+            const paid = items.reduce((s, b) => s + Number(b.paid || 0), 0);
+            const pct = c.cap ? Math.min(120, (sum / c.cap) * 100) : 0;
+            const overCap = sum > c.cap;
+            return (
+              <div key={c.id} className="list-row">
+                <div className="icon-tile" style={{ background: c.colour, color: "#fff" }}>{c.name[0]}</div>
+                <div className="body">
+                  <div className="title">{c.name}</div>
+                  <div className="meta">{items.length} item{items.length !== 1 ? "s" : ""} · {gbp(paid)} paid</div>
+                  <div className="progress" style={{ marginTop: 6, maxWidth: 340 }}>
+                    <div className={overCap ? "warn" : ""} style={{ width: pct + "%", background: overCap ? "var(--amber)" : c.colour }}></div>
+                  </div>
+                </div>
+                <div className="right">
+                  <strong>{gbp(sum)}</strong>
+                  {overCap && <span className="pill rose" style={{ marginLeft: 8 }}>Over cap</span>}
+                  <div className="meta">of {gbp(c.cap)} cap</div>
+                </div>
+                <button className="btn-ghost btn-sm" onClick={() => setEditCat(c)}>Edit</button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="section-h"><h2>Line items</h2></div>
+      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+        <table className="aisle">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Category</th>
+              <th>Vendor</th>
+              <th>Estimated</th>
+              <th>Paid</th>
+              <th>Due</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {budgetItems.map(b => {
+              const cat = budgetCategories.find(c => c.id === b.categoryId);
+              return (
+                <tr key={b.id}>
+                  <td><strong>{b.name}</strong></td>
+                  <td><span className="pill grey">{cat ? cat.name : "—"}</span></td>
+                  <td>{b.vendor || "—"}</td>
+                  <td>{gbp(b.estimated)}</td>
+                  <td>{gbp(b.paid)}</td>
+                  <td>{b.dueDate ? fmtDate(b.dueDate) : "—"}</td>
+                  <td><span className={"pill " + (b.status === "Paid" ? "sage" : b.status === "Booked" ? "gold" : "grey")}>{b.status}</span></td>
+                  <td>
+                    <button className="btn-ghost btn-sm" onClick={() => setEditing(b)}>Edit</button>
+                    <button className="btn-ghost btn-sm" onClick={() => removeItem(b.id)} style={{ color: "var(--terracotta)" }}>×</button>
+                  </td>
+                </tr>
+              );
+            })}
+            {budgetItems.length === 0 && (
+              <tr><td colSpan="8"><div className="empty"><div className="e-title">No line items yet</div><div className="e-sub">Add your first line item to start tracking.</div></div></td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {editing && (
+        <Modal title={editing.id ? "Edit line item" : "Add line item"} onClose={() => setEditing(null)}
+          footer={<><button className="btn" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={() => saveItem(editing)} disabled={!editing.name}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field full"><label>Name</label><input value={editing.name} onChange={e => setEditing({ ...editing, name: e.target.value })} autoFocus/></div>
+            <div className="field"><label>Category</label>
+              <select value={editing.categoryId} onChange={e => setEditing({ ...editing, categoryId: e.target.value })}>
+                {budgetCategories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div className="field"><label>Vendor</label><input value={editing.vendor || ""} onChange={e => setEditing({ ...editing, vendor: e.target.value })}/></div>
+            <div className="field"><label>Estimated (£)</label><input type="number" value={editing.estimated} onChange={e => setEditing({ ...editing, estimated: Number(e.target.value) })}/></div>
+            <div className="field"><label>Paid (£)</label><input type="number" value={editing.paid} onChange={e => setEditing({ ...editing, paid: Number(e.target.value) })}/></div>
+            <div className="field"><label>Due date</label><input type="date" value={editing.dueDate || ""} onChange={e => setEditing({ ...editing, dueDate: e.target.value })}/></div>
+            <div className="field"><label>Status</label>
+              <select value={editing.status} onChange={e => setEditing({ ...editing, status: e.target.value })}>
+                <option>Planning</option><option>Quoted</option><option>Booked</option><option>Paid</option>
+              </select>
+            </div>
+          </div>
+        </Modal>
+      )}
+      {editCat && (
+        <Modal title={editCat.id ? "Edit category" : "Add category"} onClose={() => setEditCat(null)}
+          footer={<><button className="btn" onClick={() => setEditCat(null)}>Cancel</button><button className="btn btn-primary" onClick={() => saveCat(editCat)} disabled={!editCat.name}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field full"><label>Name</label><input value={editCat.name} onChange={e => setEditCat({ ...editCat, name: e.target.value })} autoFocus/></div>
+            <div className="field"><label>Cap (£)</label><input type="number" value={editCat.cap} onChange={e => setEditCat({ ...editCat, cap: Number(e.target.value) })}/></div>
+            <div className="field"><label>Colour</label><input type="color" value={editCat.colour} onChange={e => setEditCat({ ...editCat, colour: e.target.value })}/></div>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ============ Plan ============
+function PlanScreen({ tasks, setTasks, showToast }) {
+  const [editing, setEditing] = useState(null);
+  const blank = { title: "", category: "Vendors", priority: "Medium", status: "Todo", assignee: "", dueDate: "", notes: "" };
+
+  function toggle(t) {
+    setTasks(ts => ts.map(x => x.id === t.id ? { ...x, status: x.status === "Done" ? "Todo" : "Done" } : x));
+  }
+  function save(t) {
+    if (t.id) setTasks(ts => ts.map(x => x.id === t.id ? t : x));
+    else setTasks(ts => [...ts, { ...t, id: uid() }]);
+    showToast(t.id ? "Task updated" : "Task added");
+    setEditing(null);
+  }
+  function remove(id) {
+    if (confirm("Remove this task?")) {
+      setTasks(ts => ts.filter(x => x.id !== id));
+      showToast("Task removed");
+    }
+  }
+
+  const todo = tasks.filter(t => t.status !== "Done").sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""));
+  const done = tasks.filter(t => t.status === "Done");
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Plan</h1>
+          <div className="sub">{todo.length} open · {done.length} done</div>
+        </div>
+        <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add task</button>
+      </div>
+
+      <h2 style={{ fontStyle: "italic", margin: "0 0 12px" }}>Up next</h2>
+      {todo.length === 0 ? (
+        <div className="card"><div className="empty"><div className="e-title">All caught up</div><div className="e-sub">Add a task to keep things moving.</div></div></div>
+      ) : todo.map(t => (
+        <div key={t.id} className="task-card">
+          <button className={"checkbox-btn" + (t.status === "Done" ? " done" : "")} onClick={() => toggle(t)}></button>
+          <div className="t-body">
+            <div className="t-name">{t.title}</div>
+            <div className="t-due">{t.dueDate ? "Due " + fmtDate(t.dueDate) : "no date"}{t.assignee && " · " + t.assignee}</div>
+          </div>
+          <span className={"pill " + (t.priority === "High" ? "terra" : t.priority === "Medium" ? "gold" : "grey")}>{t.priority}</span>
+          <span className="pill grey">{t.category}</span>
+          <div className="t-actions">
+            <button className="btn-ghost btn-sm" onClick={() => setEditing(t)}>Edit</button>
+            <button className="btn-ghost btn-sm" onClick={() => remove(t.id)} style={{ color: "var(--terracotta)" }}>×</button>
+          </div>
+        </div>
+      ))}
+
+      {done.length > 0 && <>
+        <h2 style={{ fontStyle: "italic", margin: "24px 0 12px" }}>Completed</h2>
+        {done.map(t => (
+          <div key={t.id} className="task-card done">
+            <button className="checkbox-btn done" onClick={() => toggle(t)}></button>
+            <div className="t-body">
+              <div className="t-name">{t.title}</div>
+              <div className="t-due">{t.assignee || ""}</div>
+            </div>
+            <button className="btn-ghost btn-sm" onClick={() => remove(t.id)} style={{ color: "var(--terracotta)" }}>×</button>
+          </div>
+        ))}
+      </>}
+
+      {editing && (
+        <Modal title={editing.id ? "Edit task" : "Add task"} onClose={() => setEditing(null)}
+          footer={<><button className="btn" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={() => save(editing)} disabled={!editing.title}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field full"><label>Title</label><input value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} autoFocus/></div>
+            <div className="field"><label>Category</label>
+              <select value={editing.category} onChange={e => setEditing({ ...editing, category: e.target.value })}>
+                <option>Vendors</option><option>Guests</option><option>Money</option><option>Outfits</option><option>Beauty</option><option>Personal</option><option>Legal</option><option>Day</option><option>Gifts</option>
+              </select>
+            </div>
+            <div className="field"><label>Priority</label>
+              <select value={editing.priority} onChange={e => setEditing({ ...editing, priority: e.target.value })}>
+                <option>Low</option><option>Medium</option><option>High</option>
+              </select>
+            </div>
+            <div className="field"><label>Status</label>
+              <select value={editing.status} onChange={e => setEditing({ ...editing, status: e.target.value })}>
+                <option>Todo</option><option>Doing</option><option>Blocked</option><option>Done</option>
+              </select>
+            </div>
+            <div className="field"><label>Due date</label><input type="date" value={editing.dueDate || ""} onChange={e => setEditing({ ...editing, dueDate: e.target.value })}/></div>
+            <div className="field full"><label>Assignee</label><input value={editing.assignee || ""} onChange={e => setEditing({ ...editing, assignee: e.target.value })}/></div>
+            <div className="field full"><label>Notes</label><textarea value={editing.notes || ""} onChange={e => setEditing({ ...editing, notes: e.target.value })}/></div>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ============ Tables ============
+function TablesScreen({ tables, setTables, guests, setGuests, showToast }) {
+  const [editing, setEditing] = useState(null);
+  const blank = { label: "", shape: "round", capacity: 8, notes: "" };
+
+  function save(t) {
+    if (t.id) setTables(ts => ts.map(x => x.id === t.id ? t : x));
+    else setTables(ts => [...ts, { ...t, id: uid() }]);
+    showToast(t.id ? "Table updated" : "Table added");
+    setEditing(null);
+  }
+  function remove(id) {
+    if (confirm("Remove this table? Seated guests will become unseated.")) {
+      setTables(ts => ts.filter(t => t.id !== id));
+      setGuests(gs => gs.map(g => g.tableId === id ? { ...g, tableId: null } : g));
+      showToast("Table removed");
+    }
+  }
+
+  const dayGuests = guests.filter(g => g.rsvp === "Accepted" && (g.dayType === "Day" || g.dayType === "Both"));
+  const unseated = dayGuests.filter(g => !g.tableId);
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Tables</h1>
+          <div className="sub">{tables.length} tables · {dayGuests.length} day guests · {unseated.length} unseated</div>
+        </div>
+        <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add table</button>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 18 }}>
+        <div>
+          {tables.length === 0 ? (
+            <div className="card"><div className="empty"><div className="e-title">No tables yet</div><div className="e-sub">Add your first table to begin seating.</div></div></div>
+          ) : tables.map(t => {
+            const seated = guests.filter(g => g.tableId === t.id);
+            const over = seated.length > t.capacity;
+            return (
+              <div key={t.id} className="vendor-card">
+                <div className="v-head">
+                  <div>
+                    <div className="v-name">{t.label}</div>
+                    <div className="v-meta">{t.shape} · capacity {t.capacity} · {seated.length} seated {over && <span className="pill rose" style={{ marginLeft: 6 }}>over capacity</span>}</div>
+                  </div>
+                  <div>
+                    <button className="btn-ghost btn-sm" onClick={() => setEditing(t)}>Edit</button>
+                    <button className="btn-ghost btn-sm" onClick={() => remove(t.id)} style={{ color: "var(--terracotta)" }}>Remove</button>
+                  </div>
+                </div>
+                {t.notes && <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 8 }}>{t.notes}</div>}
+                <div className="progress"><div className={over ? "warn" : ""} style={{ width: Math.min(100, (seated.length / t.capacity) * 100) + "%" }}></div></div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 12 }}>
+                  {seated.map(s => (
+                    <span key={s.id} className="pill grey" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      {s.firstName} {s.lastName}
+                      <button className="btn-ghost" style={{ padding: 0, fontSize: 11 }} onClick={() => setGuests(gs => gs.map(g => g.id === s.id ? { ...g, tableId: null } : g))}>×</button>
+                    </span>
+                  ))}
+                  {seated.length === 0 && <span style={{ fontSize: 12, color: "var(--muted)" }}>No guests seated yet.</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="card">
+          <h3 style={{ marginBottom: 12 }}>Unseated day guests ({unseated.length})</h3>
+          {unseated.length === 0 ? <div style={{ fontSize: 12, color: "var(--muted)" }}>Everyone is seated. Nicely done.</div>
+            : unseated.map(g => (
+              <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--rule)" }}>
+                <div className="guest-avatar">{initials(g.firstName + " " + g.lastName)}</div>
+                <div style={{ flex: 1, fontSize: 13 }}>
+                  <div>{g.firstName} {g.lastName}</div>
+                  <div style={{ fontSize: 11, color: "var(--muted)" }}>{g.household}</div>
+                </div>
+                <select value="" onChange={e => { setGuests(gs => gs.map(x => x.id === g.id ? { ...x, tableId: e.target.value } : x)); showToast(`Seated ${g.firstName}`); }} style={{ fontSize: 12, padding: "4px 8px", border: "1px solid var(--rule-2)", borderRadius: 6 }}>
+                  <option value="">Seat at…</option>
+                  {tables.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+                </select>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      {editing && (
+        <Modal title={editing.id ? "Edit table" : "Add table"} onClose={() => setEditing(null)}
+          footer={<><button className="btn" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={() => save(editing)} disabled={!editing.label}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field full"><label>Label</label><input value={editing.label} onChange={e => setEditing({ ...editing, label: e.target.value })} autoFocus/></div>
+            <div className="field"><label>Shape</label>
+              <select value={editing.shape} onChange={e => setEditing({ ...editing, shape: e.target.value })}>
+                <option>round</option><option>rect</option><option>oval</option><option>sweetheart</option>
+              </select>
+            </div>
+            <div className="field"><label>Capacity</label><input type="number" value={editing.capacity} onChange={e => setEditing({ ...editing, capacity: Number(e.target.value) })}/></div>
+            <div className="field full"><label>Notes</label><textarea value={editing.notes || ""} onChange={e => setEditing({ ...editing, notes: e.target.value })}/></div>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ============ Day schedule ============
+function DayScreen({ wedding, schedule, setSchedule, showToast }) {
+  const [editing, setEditing] = useState(null);
+  const blank = { time: "12:00", title: "", location: "", responsible: "", notes: "", critical: false, buffer: false };
+
+  function save(s) {
+    if (s.id) setSchedule(sc => sc.map(x => x.id === s.id ? s : x));
+    else setSchedule(sc => [...sc, { ...s, id: uid() }]);
+    showToast(s.id ? "Updated" : "Added to schedule");
+    setEditing(null);
+  }
+  function remove(id) {
+    if (confirm("Remove from schedule?")) {
+      setSchedule(sc => sc.filter(x => x.id !== id));
+      showToast("Removed");
+    }
+  }
+  const sorted = [...schedule].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Wedding day</h1>
+          <div className="sub">{fmtDateLong(wedding.date)} · {wedding.ceremonyTime} ceremony · {schedule.length} items</div>
+        </div>
+        <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add item</button>
+      </div>
+
+      {sorted.length === 0 ? (
+        <div className="card"><div className="empty"><div className="e-title">No schedule yet</div><div className="e-sub">Add your first item — perhaps "Hair & makeup begins".</div></div></div>
+      ) : (
+        <div className="timeline">
+          {sorted.map(s => (
+            <div key={s.id} className={"t-item" + (s.critical ? " critical" : "") + (s.buffer ? " buffer" : "")}>
+              <div className="time">{s.time}</div>
+              <div className="t-row">
+                <div>
+                  <div className="t-title">{s.title}</div>
+                  <div className="t-meta">{[s.location, s.responsible, s.notes].filter(Boolean).join(" · ")}</div>
+                </div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {s.critical && <span className="pill terra">Critical</span>}
+                  {s.buffer && <span className="pill grey">Buffer</span>}
+                  <button className="btn-ghost btn-sm" onClick={() => setEditing(s)}>Edit</button>
+                  <button className="btn-ghost btn-sm" onClick={() => remove(s.id)} style={{ color: "var(--terracotta)" }}>×</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {editing && (
+        <Modal title={editing.id ? "Edit schedule item" : "Add schedule item"} onClose={() => setEditing(null)}
+          footer={<><button className="btn" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={() => save(editing)} disabled={!editing.title}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field"><label>Time</label><input type="time" value={editing.time} onChange={e => setEditing({ ...editing, time: e.target.value })}/></div>
+            <div className="field"><label>Title</label><input value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} autoFocus/></div>
+            <div className="field"><label>Location</label><input value={editing.location || ""} onChange={e => setEditing({ ...editing, location: e.target.value })}/></div>
+            <div className="field"><label>Responsible</label><input value={editing.responsible || ""} onChange={e => setEditing({ ...editing, responsible: e.target.value })}/></div>
+            <div className="field full"><label>Notes</label><textarea value={editing.notes || ""} onChange={e => setEditing({ ...editing, notes: e.target.value })}/></div>
+            <div className="field"><label className="checkbox-row"><input type="checkbox" checked={editing.critical} onChange={e => setEditing({ ...editing, critical: e.target.checked })}/> Critical</label></div>
+            <div className="field"><label className="checkbox-row"><input type="checkbox" checked={editing.buffer} onChange={e => setEditing({ ...editing, buffer: e.target.checked })}/> Buffer</label></div>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ============ Music ============
+function MusicScreen({ music, setMusic, showToast }) {
+  const [editing, setEditing] = useState(null);
+  const blank = { moment: "Drinks reception", title: "", artist: "", performer: "", list: "neither", notes: "" };
+
+  function save(m) {
+    if (m.id) setMusic(ms => ms.map(x => x.id === m.id ? m : x));
+    else setMusic(ms => [...ms, { ...m, id: uid() }]);
+    showToast(m.id ? "Updated" : "Added");
+    setEditing(null);
+  }
+  function remove(id) {
+    setMusic(ms => ms.filter(x => x.id !== id));
+    showToast("Removed");
+  }
+
+  const grouped = {};
+  music.forEach(m => { (grouped[m.moment] = grouped[m.moment] || []).push(m); });
+  const order = ["Pre-ceremony", "Processional", "Signing the register", "Recessional", "Drinks reception", "Wedding breakfast", "Cake cutting", "First dance", "Parents' dance", "Party set", "Last song", "Do-not-play"];
+  const moments = order.filter(m => grouped[m]);
+  Object.keys(grouped).forEach(m => { if (!moments.includes(m)) moments.push(m); });
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Music</h1>
+          <div className="sub">{music.length} tracks · {music.filter(m => m.list === "must").length} must-play · {music.filter(m => m.list === "donot").length} do-not-play</div>
+        </div>
+        <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add track</button>
+      </div>
+
+      {moments.length === 0 ? (
+        <div className="card"><div className="empty"><div className="e-title">No music yet</div><div className="e-sub">Add your first must-play.</div></div></div>
+      ) : moments.map(m => (
+        <div key={m} style={{ marginBottom: 24 }}>
+          <h2 style={{ fontStyle: "italic", margin: "12px 0 10px" }}>{m}</h2>
+          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <table className="aisle">
+              <thead><tr><th>Track</th><th>Performer</th><th>List</th><th>Notes</th><th></th></tr></thead>
+              <tbody>
+                {grouped[m].map(t => (
+                  <tr key={t.id}>
+                    <td><strong>{t.title}</strong> <span style={{ color: "var(--muted)" }}>— {t.artist}</span></td>
+                    <td>{t.performer}</td>
+                    <td><span className={"pill " + (t.list === "must" ? "sage" : t.list === "donot" ? "rose" : "grey")}>{t.list === "must" ? "Must play" : t.list === "donot" ? "Do not play" : "—"}</span></td>
+                    <td style={{ color: "var(--muted)" }}>{t.notes}</td>
+                    <td>
+                      <button className="btn-ghost btn-sm" onClick={() => setEditing(t)}>Edit</button>
+                      <button className="btn-ghost btn-sm" onClick={() => remove(t.id)} style={{ color: "var(--terracotta)" }}>×</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+
+      {editing && (
+        <Modal title={editing.id ? "Edit track" : "Add track"} onClose={() => setEditing(null)}
+          footer={<><button className="btn" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={() => save(editing)} disabled={!editing.title}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field"><label>Moment</label>
+              <select value={editing.moment} onChange={e => setEditing({ ...editing, moment: e.target.value })}>
+                {order.map(o => <option key={o}>{o}</option>)}
+              </select>
+            </div>
+            <div className="field"><label>List</label>
+              <select value={editing.list} onChange={e => setEditing({ ...editing, list: e.target.value })}>
+                <option value="must">Must play</option><option value="donot">Do not play</option><option value="neither">Just a suggestion</option>
+              </select>
+            </div>
+            <div className="field"><label>Title</label><input value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} autoFocus/></div>
+            <div className="field"><label>Artist</label><input value={editing.artist} onChange={e => setEditing({ ...editing, artist: e.target.value })}/></div>
+            <div className="field full"><label>Performer</label><input value={editing.performer} onChange={e => setEditing({ ...editing, performer: e.target.value })} placeholder="DJ / band / recorded"/></div>
+            <div className="field full"><label>Notes</label><textarea value={editing.notes} onChange={e => setEditing({ ...editing, notes: e.target.value })}/></div>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ============ Mood ============
+function MoodScreen({ mood, setMood, showToast }) {
+  const [editing, setEditing] = useState(null);
+  const [filter, setFilter] = useState("All");
+  const blank = { category: "Flowers", caption: "", url: "", colours: ["#E6CFC8", "#9B5C4E", "#6C8C6E"], love: "love" };
+  const fileRef = useRef();
+
+  const categories = ["All", "Flowers", "Dresses", "Suits", "Décor", "Cakes", "Hair", "Makeup", "Stationery", "Venues", "Table styling", "Photography"];
+  const shown = filter === "All" ? mood : mood.filter(m => m.category === filter);
+
+  function save(m) {
+    if (m.id) setMood(ms => ms.map(x => x.id === m.id ? m : x));
+    else setMood(ms => [...ms, { ...m, id: uid() }]);
+    showToast(m.id ? "Updated" : "Added to mood board");
+    setEditing(null);
+  }
+  function remove(id) {
+    setMood(ms => ms.filter(m => m.id !== id));
+    showToast("Removed");
+  }
+
+  function handleFile(file, target) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const url = e.target.result;
+      target({ ...editing, url });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Mood board</h1>
+          <div className="sub">{mood.length} saved · {mood.filter(m => m.love === "love").length} loved</div>
+        </div>
+        <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add image</button>
+      </div>
+
+      <div className="mood-tabs">
+        {categories.map(c => (
+          <button key={c} className={"mood-tab" + (filter === c ? " active" : "")} onClick={() => setFilter(c)}>{c}</button>
+        ))}
+      </div>
+
+      {shown.length === 0 ? (
+        <div className="card"><div className="empty"><div className="e-title">Nothing here yet</div><div className="e-sub">Add your first inspiration image.</div><button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add image</button></div></div>
+      ) : (
+        <div className="mood-grid">
+          {shown.map(m => (
+            <div key={m.id} onClick={() => setEditing(m)}>
+              <MoodPreview m={m} />
+              <div className="mood-cap"><span>{m.caption || m.category}</span>{m.love === "love" && <span className="heart">♥</span>}{m.love === "maybe" && <span style={{ color: "var(--muted)" }}>maybe</span>}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {editing && (
+        <Modal title={editing.id ? "Edit image" : "Add image"} onClose={() => setEditing(null)}
+          footer={<>{editing.id && <button className="btn btn-danger" onClick={() => { remove(editing.id); setEditing(null); }}>Remove</button>}<button className="btn" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={() => save(editing)} disabled={!editing.caption && !editing.url}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field full"><label>Image</label>
+              {editing.url ? (
+                <div style={{ position: "relative" }}>
+                  <img src={editing.url} style={{ width: "100%", maxHeight: 220, objectFit: "cover", borderRadius: 10 }} alt=""/>
+                  <button className="btn btn-sm" style={{ position: "absolute", top: 8, right: 8 }} onClick={() => setEditing({ ...editing, url: "" })}>Replace</button>
+                </div>
+              ) : (
+                <>
+                  <input type="file" accept="image/*" ref={fileRef} onChange={e => e.target.files[0] && handleFile(e.target.files[0], setEditing)} style={{ display: "none" }}/>
+                  <button className="btn" onClick={() => fileRef.current?.click()}>📷 Choose image from your device</button>
+                  <input style={{ marginTop: 8 }} placeholder="…or paste an image URL" value={editing.url || ""} onChange={e => setEditing({ ...editing, url: e.target.value })}/>
+                </>
+              )}
+            </div>
+            <div className="field"><label>Category</label>
+              <select value={editing.category} onChange={e => setEditing({ ...editing, category: e.target.value })}>
+                {categories.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="field"><label>Status</label>
+              <select value={editing.love} onChange={e => setEditing({ ...editing, love: e.target.value })}>
+                <option value="love">Love it</option><option value="maybe">Maybe</option><option value="no">No thanks</option>
+              </select>
+            </div>
+            <div className="field full"><label>Caption</label><input value={editing.caption} onChange={e => setEditing({ ...editing, caption: e.target.value })} placeholder="e.g., Wildflower bouquet"/></div>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ============ Vendors ============
+function VendorsScreen({ vendors, setVendors, showToast }) {
+  const [editing, setEditing] = useState(null);
+  const blank = { name: "", category: "Venue", contact: "", email: "", phone: "", quote: 0, deposit: 0, balance: 0, status: "Researching", rating: 0, notes: "" };
+
+  function save(v) {
+    const safe = { ...v, balance: Number(v.quote) - Number(v.deposit) };
+    if (v.id) setVendors(vs => vs.map(x => x.id === v.id ? safe : x));
+    else setVendors(vs => [...vs, { ...safe, id: uid() }]);
+    showToast(v.id ? "Updated" : "Added");
+    setEditing(null);
+  }
+  function remove(id) {
+    if (confirm("Remove this vendor?")) {
+      setVendors(vs => vs.filter(v => v.id !== id));
+      showToast("Removed");
+    }
+  }
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Vendors</h1>
+          <div className="sub">{vendors.length} on your list · {vendors.filter(v => v.status === "Booked").length} booked</div>
+        </div>
+        <button className="btn btn-primary" onClick={() => setEditing({ ...blank })}>+ Add vendor</button>
+      </div>
+
+      {vendors.length === 0 ? (
+        <div className="card"><div className="empty"><div className="e-title">No vendors yet</div><div className="e-sub">Add your first shortlist.</div></div></div>
+      ) : (
+        vendors.map(v => (
+          <div key={v.id} className="vendor-card">
+            <div className="v-head">
+              <div>
+                <div className="v-name">{v.name}</div>
+                <div className="v-meta">{v.category}{v.contact && " · " + v.contact}{v.email && " · " + v.email}</div>
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                <span className={"pill " + (v.status === "Booked" ? "sage" : v.status === "Declined" ? "rose" : "grey")}>{v.status}</span>
+                <button className="btn-ghost btn-sm" onClick={() => setEditing(v)}>Edit</button>
+                <button className="btn-ghost btn-sm" onClick={() => remove(v.id)} style={{ color: "var(--terracotta)" }}>×</button>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 20, marginTop: 8, fontSize: 13, color: "var(--muted)", flexWrap: "wrap" }}>
+              <span><strong style={{ color: "var(--ink)" }}>{gbp(v.quote)}</strong> quote</span>
+              <span><strong style={{ color: "var(--ink)" }}>{gbp(v.deposit)}</strong> deposit paid</span>
+              <span><strong style={{ color: "var(--ink)" }}>{gbp(Number(v.quote) - Number(v.deposit))}</strong> balance</span>
+              <span>Rating: {"★".repeat(v.rating || 0)}{"☆".repeat(5 - (v.rating || 0))}</span>
+            </div>
+            {v.notes && <div style={{ marginTop: 8, fontSize: 13 }}>{v.notes}</div>}
+          </div>
+        ))
+      )}
+
+      {editing && (
+        <Modal title={editing.id ? "Edit vendor" : "Add vendor"} onClose={() => setEditing(null)} lg
+          footer={<><button className="btn" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={() => save(editing)} disabled={!editing.name}>Save</button></>}>
+          <div className="form-grid">
+            <div className="field"><label>Business name</label><input value={editing.name} onChange={e => setEditing({ ...editing, name: e.target.value })} autoFocus/></div>
+            <div className="field"><label>Category</label>
+              <select value={editing.category} onChange={e => setEditing({ ...editing, category: e.target.value })}>
+                <option>Venue</option><option>Catering</option><option>Photography</option><option>Videography</option><option>Flowers</option><option>Music</option><option>Cake</option><option>Stationery</option><option>Beauty</option><option>Transport</option><option>Other</option>
+              </select>
+            </div>
+            <div className="field"><label>Contact</label><input value={editing.contact} onChange={e => setEditing({ ...editing, contact: e.target.value })}/></div>
+            <div className="field"><label>Email</label><input value={editing.email} onChange={e => setEditing({ ...editing, email: e.target.value })}/></div>
+            <div className="field"><label>Phone</label><input value={editing.phone} onChange={e => setEditing({ ...editing, phone: e.target.value })}/></div>
+            <div className="field"><label>Status</label>
+              <select value={editing.status} onChange={e => setEditing({ ...editing, status: e.target.value })}>
+                <option>Researching</option><option>Enquired</option><option>Quote received</option><option>Meeting booked</option><option>Booked</option><option>Declined</option>
+              </select>
+            </div>
+            <div className="field"><label>Quote (£)</label><input type="number" value={editing.quote} onChange={e => setEditing({ ...editing, quote: Number(e.target.value) })}/></div>
+            <div className="field"><label>Deposit paid (£)</label><input type="number" value={editing.deposit} onChange={e => setEditing({ ...editing, deposit: Number(e.target.value) })}/></div>
+            <div className="field"><label>Rating</label>
+              <select value={editing.rating} onChange={e => setEditing({ ...editing, rating: Number(e.target.value) })}>
+                <option value="0">—</option><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option><option value="4">★★★★</option><option value="5">★★★★★</option>
+              </select>
+            </div>
+            <div className="field full"><label>Notes</label><textarea value={editing.notes} onChange={e => setEditing({ ...editing, notes: e.target.value })}/></div>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+}
+
+// ============ Settings ============
+function SettingsScreen({ wedding, setWedding, exportData, importData, resetData, showToast }) {
+  const [local, setLocal] = useState(wedding);
+  const fileRef = useRef();
+
+  function save() {
+    setWedding(local);
+    showToast("Wedding details saved");
+  }
+  function handleImport(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        importData(data);
+        showToast("Data imported");
+      } catch {
+        alert("Could not parse this file as JSON.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  return (
+    <>
+      <div className="page-title">
+        <div>
+          <h1>Settings</h1>
+          <div className="sub">Wedding details, collaborators, and your data</div>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 18 }}>
+        <h2 style={{ fontStyle: "italic", margin: "0 0 16px" }}>Wedding details</h2>
+        <div className="form-grid">
+          <div className="field"><label>Partner 1 name</label><input value={local.coupleA} onChange={e => setLocal({ ...local, coupleA: e.target.value })}/></div>
+          <div className="field"><label>Partner 2 name</label><input value={local.coupleB} onChange={e => setLocal({ ...local, coupleB: e.target.value })}/></div>
+          <div className="field"><label>Wedding date</label><input type="date" value={local.date} onChange={e => setLocal({ ...local, date: e.target.value })}/></div>
+          <div className="field"><label>Ceremony time</label><input type="time" value={local.ceremonyTime} onChange={e => setLocal({ ...local, ceremonyTime: e.target.value })}/></div>
+          <div className="field full"><label>Venue</label><input value={local.venue} onChange={e => setLocal({ ...local, venue: e.target.value })}/></div>
+          <div className="field"><label>Total budget (£)</label><input type="number" value={local.budgetTotal} onChange={e => setLocal({ ...local, budgetTotal: Number(e.target.value) })}/></div>
+        </div>
+        <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+          <button className="btn btn-primary" onClick={save}>Save</button>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 18 }}>
+        <h2 style={{ fontStyle: "italic", margin: "0 0 8px" }}>Your data</h2>
+        <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 0 }}>Everything is stored in your browser. Export a JSON file as a backup, or to move to another device.</p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="btn" onClick={exportData}>⤓ Export JSON backup</button>
+          <input type="file" accept="application/json" ref={fileRef} onChange={e => e.target.files[0] && handleImport(e.target.files[0])} style={{ display: "none" }}/>
+          <button className="btn" onClick={() => fileRef.current?.click()}>⤒ Import JSON</button>
+          <button className="btn btn-danger" onClick={resetData}>Reset to demo data</button>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2 style={{ fontStyle: "italic", margin: "0 0 8px" }}>About</h2>
+        <p style={{ fontSize: 13, color: "var(--muted)" }}>Aisle is an interactive wedding planning app. Data lives in your browser (localStorage) — no account needed, nothing leaves your device.</p>
+        <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 0 }}>Built as a single static page. Deploy by pushing this file to a GitHub repo and turning on GitHub Pages.</p>
+      </div>
+    </>
+  );
+}
+
+// ============ App ============
+function App() {
+  const [screen, setScreen] = useState("home");
+  const [wedding, setWedding] = useLocalState("aisle.wedding", SEED.wedding);
+  const [guests, setGuests] = useLocalState("aisle.guests", SEED.guests);
+  const [budgetCategories, setBudgetCategories] = useLocalState("aisle.budgetCategories", SEED.budgetCategories);
+  const [budgetItems, setBudgetItems] = useLocalState("aisle.budgetItems", SEED.budgetItems);
+  const [tasks, setTasks] = useLocalState("aisle.tasks", SEED.tasks);
+  const [schedule, setSchedule] = useLocalState("aisle.schedule", SEED.schedule);
+  const [music, setMusic] = useLocalState("aisle.music", SEED.music);
+  const [mood, setMood] = useLocalState("aisle.mood", SEED.mood);
+  const [tables, setTables] = useLocalState("aisle.tables", SEED.tables);
+  const [vendors, setVendors] = useLocalState("aisle.vendors", SEED.vendors);
+  const [toast, setToast] = useState("");
+
+  const showToast = (msg) => setToast(msg);
+
+  function exportData() {
+    const data = { wedding, guests, budgetCategories, budgetItems, tasks, schedule, music, mood, tables, vendors, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `aisle-wedding-${wedding.date || "backup"}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Backup downloaded");
+  }
+  function importData(d) {
+    if (d.wedding) setWedding(d.wedding);
+    if (d.guests) setGuests(d.guests);
+    if (d.budgetCategories) setBudgetCategories(d.budgetCategories);
+    if (d.budgetItems) setBudgetItems(d.budgetItems);
+    if (d.tasks) setTasks(d.tasks);
+    if (d.schedule) setSchedule(d.schedule);
+    if (d.music) setMusic(d.music);
+    if (d.mood) setMood(d.mood);
+    if (d.tables) setTables(d.tables);
+    if (d.vendors) setVendors(d.vendors);
+  }
+  function resetData() {
+    if (confirm("Reset everything back to demo data? Anything you've added will be lost.")) {
+      Object.keys(localStorage).filter(k => k.startsWith("aisle.")).forEach(k => localStorage.removeItem(k));
+      window.location.reload();
+    }
+  }
+
+  const counts = { guests: guests.length, openTasks: tasks.filter(t => t.status !== "Done").length };
+
+  return (
+    <div className="app">
+      <Sidebar screen={screen} setScreen={setScreen} wedding={wedding} counts={counts} />
+      <main className="main">
+        <div className="topbar">
+          <div className="crumb">{
+            ({ home: "Home / Dashboard", plan: "Plan / Tasks", guests: "Guests / All", tables: "Guests / Tables", money: "Money / Budget", day: "Day / Schedule", music: "Day / Music", mood: "Day / Mood board", vendors: "Money / Vendors", settings: "Settings" }[screen]) || ""
+          }</div>
+          <div className="topbar-actions">
+            <button className="btn" onClick={exportData}>Backup</button>
+            <button className="btn btn-primary" onClick={() => setScreen("settings")}>⚙ Settings</button>
+          </div>
+        </div>
+        {screen === "home" && <Home wedding={wedding} guests={guests} budgetItems={budgetItems} budgetCategories={budgetCategories} tasks={tasks} mood={mood} setScreen={setScreen} />}
+        {screen === "plan" && <PlanScreen tasks={tasks} setTasks={setTasks} showToast={showToast} />}
+        {screen === "guests" && <GuestsScreen guests={guests} setGuests={setGuests} tables={tables} showToast={showToast} />}
+        {screen === "tables" && <TablesScreen tables={tables} setTables={setTables} guests={guests} setGuests={setGuests} showToast={showToast} />}
+        {screen === "money" && <MoneyScreen wedding={wedding} setWedding={setWedding} budgetCategories={budgetCategories} setBudgetCategories={setBudgetCategories} budgetItems={budgetItems} setBudgetItems={setBudgetItems} showToast={showToast} />}
+        {screen === "day" && <DayScreen wedding={wedding} schedule={schedule} setSchedule={setSchedule} showToast={showToast} />}
+        {screen === "music" && <MusicScreen music={music} setMusic={setMusic} showToast={showToast} />}
+        {screen === "mood" && <MoodScreen mood={mood} setMood={setMood} showToast={showToast} />}
+        {screen === "vendors" && <VendorsScreen vendors={vendors} setVendors={setVendors} showToast={showToast} />}
+        {screen === "settings" && <SettingsScreen wedding={wedding} setWedding={setWedding} exportData={exportData} importData={importData} resetData={resetData} showToast={showToast} />}
+      </main>
+      <Toast message={toast} onClose={() => setToast("")} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
